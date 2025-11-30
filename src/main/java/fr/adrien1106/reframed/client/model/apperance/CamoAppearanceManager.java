@@ -41,9 +41,9 @@ import java.util.function.Function;
 public class CamoAppearanceManager {
 
 
-	protected static final SpriteIdentifier DEFAULT_SPRITE_MAIN = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier(ReFramed.MODID, "block/framed_block"));
-	protected static final SpriteIdentifier DEFAULT_SPRITE_SECONDARY = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier(ReFramed.MODID, "block/framed_accent_block"));
-	private static final SpriteIdentifier BARRIER_SPRITE_ID = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier("minecraft:item/barrier"));
+	protected static final SpriteIdentifier DEFAULT_SPRITE_MAIN = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, Identifier.of(ReFramed.MODID, "block/framed_block"));
+	protected static final SpriteIdentifier DEFAULT_SPRITE_SECONDARY = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, Identifier.of(ReFramed.MODID, "block/framed_accent_block"));
+	private static final SpriteIdentifier BARRIER_SPRITE_ID = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, Identifier.of("minecraft", "item/barrier"));
 	private static final Cache<BlockState, CamoAppearance> APPEARANCE_CACHE = CacheBuilder.newBuilder().maximumSize(2048).build();
 
 	public CamoAppearanceManager(Function<SpriteIdentifier, Sprite> spriteLookup) {
@@ -130,7 +130,7 @@ public class CamoAppearanceManager {
 			);
 		}
 		List<Weighted.Present<Appearance>> appearances = weighted_model.getModels().stream()
-			.map(baked_model -> Weighted.of(getAppearance(baked_model.getData()), baked_model.getWeight().getValue()))
+			.map(baked_model -> Weighted.of(getAppearance(baked_model.data()), baked_model.getWeight().getValue()))
 			.toList();
 
 		return new WeightedComputedAppearance(

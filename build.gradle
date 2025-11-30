@@ -4,7 +4,7 @@ import fr.altarik.CreateTag
 
 plugins {
 	id "com.modrinth.minotaur" version "2.+"
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -35,6 +35,10 @@ base {
 
 sourceSets {
 	main {
+		java {
+			exclude '**/compat_disabled/**'
+			exclude '**/mixin/IAxiomChunkedBlockRegionMixin.java'
+		}
 		resources {
 			srcDirs += {
 				'src/generated'
@@ -103,27 +107,27 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Indium and sodium for sodium support
-	modCompileOnly "maven.modrinth:indium:${project.indium_version}+mc${project.minecraft_version}"
+	// Sodium for render optimization (includes Fabric Rendering API support)
 	modCompileOnly "maven.modrinth:sodium:mc${project.minecraft_version}-${project.sodium_version}"
-//	modRuntimeOnly "maven.modrinth:indium:${project.indium_version}+mc${project.minecraft_version}"
-//	modRuntimeOnly "maven.modrinth:sodium:mc${project.minecraft_version}-${project.sodium_version}"
+	modRuntimeOnly "maven.modrinth:sodium:mc${project.minecraft_version}-${project.sodium_version}"
+	// Note: Indium no longer needed - Sodium 0.6+ has Fabric Rendering API built-in
 
 	// Athena for connected textures
-	modCompileOnly "earth.terrarium.athena:athena-fabric-${project.minecraft_version}:${project.athena_version}"
-	modRuntimeOnly "earth.terrarium.athena:athena-fabric-${project.minecraft_version}:${project.athena_version}"
+	// TODO: Re-enable after finding correct versions
+	// modCompileOnly "earth.terrarium.athena:athena-fabric-${project.minecraft_version}:${project.athena_version}"
+	// modRuntimeOnly "earth.terrarium.athena:athena-fabric-${project.minecraft_version}:${project.athena_version}"
 
 	// Continuity for connected textures
 	modCompileOnly "maven.modrinth:continuity:${project.continuity_version}"
 	modRuntimeOnly "maven.modrinth:continuity:${project.continuity_version}"
 
 	// Chipped to test athena implementation
-	modRuntimeOnly "com.teamresourceful.resourcefullib:resourcefullib-fabric-${project.minecraft_version}:2.4.7"
-	modRuntimeOnly "earth.terrarium.chipped:Chipped-fabric-${project.minecraft_version}:3.1.2"
+	// modRuntimeOnly "com.teamresourceful.resourcefullib:resourcefullib-fabric-${project.minecraft_version}:2.4.7"
+	// modRuntimeOnly "earth.terrarium.chipped:Chipped-fabric-${project.minecraft_version}:3.1.2"
 
 	// Axiom for blueprint support
-	modCompileOnly "maven.modrinth:N6n5dqoA:YxeYxQyz"
-    modCompileOnly "com.github.moulberry:AxiomClientAPI:1.0.5.3"
+	// modCompileOnly "maven.modrinth:N6n5dqoA:YxeYxQyz"
+    // modCompileOnly "com.github.moulberry:AxiomClientAPI:1.0.5.3"
 
 	// Fabric API.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
@@ -135,7 +139,6 @@ processResources {
 	inputs.property "loader_version", project.loader_version
 	inputs.property "mod_id", project.mod_id
 	inputs.property "athena_version", project.athena_version
-	inputs.property "indium_version", project.indium_version
 	inputs.property "sodium_version", project.sodium_version
 	inputs.property "continuity_version", project.continuity_version
 	filteringCharset "UTF-8"
@@ -145,7 +148,7 @@ processResources {
 	}
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
 	// ensure that the encoding is set to UTF-8, no matter what the system default is
 	// this fixes some edge cases with special characters not displaying correctly
@@ -158,8 +161,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 
 	def javaVersion = JavaVersion.toVersion(targetJavaVersion)
 	if (JavaVersion.current() < javaVersion) {
@@ -216,7 +219,7 @@ modrinth {
 	dependencies {
 		required.project "fabric-api"
 		optional.version "b1ZV3DIJ", "${project.athena_version}"
-		optional.version "Orvt0mRa", "${project.indium_version}+mc${project.minecraft_version}"
+		// Indium no longer needed - Sodium 0.6+ has Fabric Rendering API built-in
 		optional.version "1IjD5062", "${project.continuity_version}"
 	}
 }

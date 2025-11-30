@@ -6,7 +6,7 @@ import fr.adrien1106.reframed.compat.ICTMQuadTransform;
 import fr.adrien1106.reframed.compat.RebakedModel;
 import fr.adrien1106.reframed.util.blocks.ThemeableBlockEntity;
 import me.pepperbell.continuity.client.config.ContinuityConfig;
-import me.pepperbell.continuity.client.model.CtmBakedModel;
+import me.pepperbell.continuity.client.model.CTMBakedModel;
 import me.pepperbell.continuity.client.model.ModelObjectsContainer;
 import me.pepperbell.continuity.client.model.QuadProcessors;
 import me.pepperbell.continuity.client.util.RenderUtil;
@@ -29,32 +29,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Mixin(CtmBakedModel.class)
+@Mixin(CTMBakedModel.class)
 public abstract class ContinuityCTMBakedModelMixin extends ForwardingBakedModel implements DynamicBakedModel {
 
     @Shadow protected abstract Function<Sprite, QuadProcessors.Slice> getSliceFunc(BlockState state);
-
-    private boolean shouldCullFace(BlockRenderView level, BlockState state, BlockPos pos, Direction face) {
-        if (level == null || pos == null || face == null) return false;
-
-        BlockPos neighborPos = pos.offset(face);
-        BlockState neighborState = level.getBlockState(neighborPos);
-
-        if (level.getBlockEntity(neighborPos) instanceof ThemeableBlockEntity neighborEntity) {
-            BlockState neighborTheme = neighborEntity.getThemes()
-                .stream()
-                .filter(theme -> theme.getBlock() == state.getBlock())
-                .findFirst()
-                .orElse(null);
-
-            if (neighborTheme != null && neighborTheme.getBlock() == state.getBlock() && !state.isOpaque()) return true;
-            return false;
-        }
-
-        if (neighborState.getBlock() == state.getBlock() && !state.isOpaque()) return true;
-
-        return neighborState.getBlock() == state.getBlock() && neighborState.isOpaque() == state.isOpaque();
-    }
 
     @Override
     public BakedModel computeQuads(@Nullable BlockRenderView level, BlockState origin_state, @Nullable BlockPos pos, int theme_index) {
@@ -91,11 +69,9 @@ public abstract class ContinuityCTMBakedModelMixin extends ForwardingBakedModel 
         transform.invokePrepare(
             level,
             state,
-            state,
             pos,
             random_supplier,
-            null,
-            false,
+            ContinuityConfig.INSTANCE.useManualCulling.get(),
             getSliceFunc(state)
         );
         Arrays.stream(Direction.values()).forEach(direction -> {
@@ -104,9 +80,6 @@ public abstract class ContinuityCTMBakedModelMixin extends ForwardingBakedModel 
             wrapped.getQuads(state, direction, random_supplier.get()).forEach(quad -> face_quads.computeIfPresent(direction, (d, quads) -> {
                 emitter.fromVanilla(quad, emitter.material(), direction);
                 transform.transform(emitter);
-
-                if (direction != null && shouldCullFace(level, state, pos, direction)) return quads;
-
                 quads.add(emitter.toBakedQuad(RenderUtil.getSpriteFinder().find(emitter)));
                 return quads;
             }));
