@@ -154,23 +154,22 @@ public class ReFramedDoorBlock extends WaterloggableReFramedBlock {
 
     @Override
     @SuppressWarnings("deprecation")
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!state.get(HAND_OPENABLE)) {
-            return ActionResult.PASS;
-        }
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
 
         ActionResult result = super.onUse(state, world, pos, player, hit);
-        if (result.isAccepted()) return result;
-
-        for (Hand hand : Hand.values()) {
-            flip(state, world, pos, player);
-            break;
+        if (result.isAccepted()) {
+            return result;
         }
 
+        if (!state.get(HAND_OPENABLE)) {
+            return ActionResult.success(world.isClient);
+        }
+
+        flip(state, world, pos, player);
         return ActionResult.success(world.isClient);
     }
 
-    
+
     public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return switch (type) {
             case LAND, AIR -> state.get(OPEN);
