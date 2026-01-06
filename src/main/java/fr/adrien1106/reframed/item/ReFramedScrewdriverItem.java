@@ -2,6 +2,7 @@ package fr.adrien1106.reframed.item;
 
 import fr.adrien1106.reframed.ReFramed;
 import fr.adrien1106.reframed.block.ReFramedDoubleBlock;
+import fr.adrien1106.reframed.block.ReFramedTrapdoorBlock;
 import fr.adrien1106.reframed.util.blocks.ThemeableBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,6 +43,18 @@ public class ReFramedScrewdriverItem extends Item {
                 if (otherState.isOf(door)) {
                     world.setBlockState(otherPos, otherState.with(ReFramedDoorBlock.HAND_OPENABLE, newValue), 3);
                 }
+
+                BlockSoundGroup group = state.getSoundGroup();
+                world.playSound(player, pos, group.getPlaceSound(), SoundCategory.BLOCKS, group.getVolume(), group.getPitch());
+            }
+            return ActionResult.success(world.isClient);
+        }
+
+        if (state.getBlock() instanceof ReFramedTrapdoorBlock) {
+            if (!world.isClient && player != null) {
+
+                boolean newValue = !state.get(ReFramedTrapdoorBlock.HAND_OPENABLE);
+                world.setBlockState(pos, state.with(ReFramedTrapdoorBlock.HAND_OPENABLE, newValue), 3);
 
                 BlockSoundGroup group = state.getSoundGroup();
                 world.playSound(player, pos, group.getPlaceSound(), SoundCategory.BLOCKS, group.getVolume(), group.getPitch());
