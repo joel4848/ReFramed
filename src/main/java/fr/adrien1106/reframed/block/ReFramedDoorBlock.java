@@ -31,6 +31,7 @@ import net.minecraft.world.WorldView;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.state.property.BooleanProperty;
 
 import java.util.function.BiConsumer;
 
@@ -40,6 +41,8 @@ public class ReFramedDoorBlock extends WaterloggableReFramedBlock {
 
     public static final VoxelShape[] DOOR_VOXELS;
 
+    public static final BooleanProperty HAND_OPENABLE = BooleanProperty.of("hand_openable");
+
     public ReFramedDoorBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState()
@@ -48,12 +51,13 @@ public class ReFramedDoorBlock extends WaterloggableReFramedBlock {
             .with(DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER)
             .with(OPEN, false)
             .with(POWERED, false)
+            .with(HAND_OPENABLE, true)
         );
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(HORIZONTAL_FACING, DOOR_HINGE, DOUBLE_BLOCK_HALF, OPEN, POWERED));
+        super.appendProperties(builder.add(HORIZONTAL_FACING, DOOR_HINGE, DOUBLE_BLOCK_HALF, OPEN, POWERED, HAND_OPENABLE));
     }
 
     @Override
@@ -151,9 +155,18 @@ public class ReFramedDoorBlock extends WaterloggableReFramedBlock {
     @Override
     @SuppressWarnings("deprecation")
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!state.get(HAND_OPENABLE)) {
+            return ActionResult.PASS;
+        }
+
         ActionResult result = super.onUse(state, world, pos, player, hit);
         if (result.isAccepted()) return result;
-        flip(state, world, pos, player);
+
+        for (Hand hand : Hand.values()) {
+            flip(state, world, pos, player);
+            break;
+        }
+
         return ActionResult.success(world.isClient);
     }
 
