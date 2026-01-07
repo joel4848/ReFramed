@@ -68,22 +68,14 @@ public class ReFramedSlopeFullBlock extends WaterloggableReFramedBlock {
     static {
 
         VoxelShape BASE_SLOPE = Stream.of(
-                createCuboidShape(0, 0, 0, 16, 1, 16),
-                createCuboidShape(0, 1, 1, 16, 2, 16),
-                createCuboidShape(0, 2, 2, 16, 3, 16),
-                createCuboidShape(0, 3, 3, 16, 4, 16),
-                createCuboidShape(0, 4, 4, 16, 5, 16),
-                createCuboidShape(0, 5, 5, 16, 6, 16),
-                createCuboidShape(0, 6, 6, 16, 7, 16),
-                createCuboidShape(0, 7, 7, 16, 8, 16),
-                createCuboidShape(0, 8, 8, 16, 9, 16),
-                createCuboidShape(0, 9, 9, 16, 10, 16),
-                createCuboidShape(0, 10, 10, 16, 11, 16),
-                createCuboidShape(0, 11, 11, 16, 12, 16),
-                createCuboidShape(0, 12, 12, 16, 13, 16),
-                createCuboidShape(0, 13, 13, 16, 14, 16),
-                createCuboidShape(0, 14, 14, 16, 15, 16),
-                createCuboidShape(0, 15, 15, 16, 16, 16)
+                createCuboidShape(0, 0, 0, 16, 2, 16),
+                createCuboidShape(0, 2, 2, 16, 4, 16),
+                createCuboidShape(0, 4, 4, 16, 6, 16),
+                createCuboidShape(0, 6, 6, 16, 8, 16),
+                createCuboidShape(0, 8, 8, 16, 10, 16),
+                createCuboidShape(0, 10, 10, 16, 12, 16),
+                createCuboidShape(0, 12, 12, 16, 14, 16),
+                createCuboidShape(0, 14, 14, 16, 16, 16)
         ).reduce((v1, v2) -> combineAndSimplify(v1, v2, BooleanBiFunction.OR)).get();
 
         SLOPE_VOXELS = VoxelListBuilder.create(BASE_SLOPE, 12)
