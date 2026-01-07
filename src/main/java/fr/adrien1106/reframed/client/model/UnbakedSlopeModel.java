@@ -1,6 +1,5 @@
 package fr.adrien1106.reframed.client.model;
 
-import fr.adrien1106.reframed.block.ReFramedSlopeFullBlock;
 import fr.adrien1106.reframed.client.ReFramedClient;
 import fr.adrien1106.reframed.util.blocks.Edge;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
@@ -28,10 +27,12 @@ import static fr.adrien1106.reframed.util.blocks.BlockProperties.EDGE;
 public class UnbakedSlopeModel extends UnbakedRetexturedModel {
 
     private final Mesh baseMesh;
+    private final Mesh itemMesh;
 
     public UnbakedSlopeModel(Identifier parent) {
         super(parent);
         this.baseMesh = SlopeFullMesh.getSlopeMesh();
+        this.itemMesh = SlopeFullMesh.getItemMesh();
         item_state = Blocks.AIR.getDefaultState();
     }
 
@@ -46,18 +47,27 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
         ) {
             @Override
             protected Mesh convertModel(BlockState state) {
-                // Get the edge from the blockstate
-                Edge edge = state != null && state.contains(EDGE)
-                        ? state.get(EDGE)
-                        : Edge.DOWN_SOUTH;
+                boolean isItem = state == null || state.isAir();
+
+                if (isItem) {
+                    MeshBuilder builder = ReFramedClient.HELPER.getFabricRenderer().meshBuilder();
+                    QuadEmitter emitter = builder.getEmitter();
+
+                    itemMesh.forEach(quad -> {
+                        emitter.copyFrom(quad);
+                        emitter.emit();
+                    });
+
+                    return builder.build();
+                }
+
+                Edge edge = state.contains(EDGE) ? state.get(EDGE) : Edge.DOWN_SOUTH;
 
                 MeshBuilder builder = ReFramedClient.HELPER.getFabricRenderer().meshBuilder();
                 QuadEmitter emitter = builder.getEmitter();
 
-                // Get transformation for this edge orientation
                 RenderContext.QuadTransform transform = getTransformForEdge(edge);
 
-                // Apply transformation to base mesh
                 baseMesh.forEach(quad -> {
                     emitter.copyFrom(quad);
                     if (transform != null) {
@@ -71,10 +81,6 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
         };
     }
 
-    /**
-     * Get the transformation to apply based on the Edge orientation.
-     * Base mesh is oriented for Edge.DOWN_SOUTH (slope rising from north to south)
-     */
     private static RenderContext.QuadTransform getTransformForEdge(Edge edge) {
         Matrix4f matrix = getRotationMatrix(edge);
         if (matrix == null) return null;
@@ -82,17 +88,26 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
         Map<Direction, Direction> faceMap = createFacePermutation(matrix);
 
         return quad -> {
-            // Transform vertex positions
+            float[] originalU = new float[4];
+            float[] originalV = new float[4];
+            for (int i = 0; i < 4; i++) {
+                originalU[i] = quad.u(i);
+                originalV[i] = quad.v(i);
+            }
+
             Vector3f pos = new Vector3f();
             for (int i = 0; i < 4; i++) {
                 quad.copyPos(i, pos);
-                pos.sub(0.5f, 0.5f, 0.5f); // Center around origin
-                pos.mulPosition(matrix);    // Apply rotation
-                pos.add(0.5f, 0.5f, 0.5f); // Move back
+                pos.sub(0.5f, 0.5f, 0.5f);
+                pos.mulPosition(matrix);
+                pos.add(0.5f, 0.5f, 0.5f);
                 quad.pos(i, pos.x(), pos.y(), pos.z());
             }
 
-            // Transform face directions
+            for (int i = 0; i < 4; i++) {
+                quad.uv(i, originalU[i], originalV[i]);
+            }
+
             Direction oldCull = quad.cullFace();
             if (oldCull != null) {
                 quad.cullFace(faceMap.get(oldCull));
@@ -109,37 +124,31 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
         };
     }
 
-    /**
-     * Get the rotation matrix for transforming from base orientation (DOWN_SOUTH)
-     * to the target edge orientation
-     */
     private static Matrix4f getRotationMatrix(Edge edge) {
         Matrix4f matrix = new Matrix4f().identity();
 
         switch (edge) {
-            case DOWN_SOUTH -> { return null; } // Base orientation, no transform
-            case NORTH_DOWN -> matrix.rotateY((float) Math.PI); // 180° around Y
-            case UP_NORTH -> matrix.rotateX((float) Math.PI); // 180° around X
-            case SOUTH_UP -> { // 180° around Y, then 180° around X
+            case DOWN_SOUTH -> { return null; }
+            case NORTH_DOWN -> matrix.rotateY((float) Math.PI);
+            case UP_NORTH -> matrix.rotateX((float) Math.PI);
+            case SOUTH_UP -> {
                 matrix.rotateY((float) Math.PI);
                 matrix.rotateX((float) Math.PI);
             }
-            case DOWN_EAST -> matrix.rotateY((float) (Math.PI / 2)); // 90° CW around Y
-            case WEST_DOWN -> matrix.rotateY((float) (-Math.PI / 2)); // 90° CCW around Y
-            case EAST_UP -> { // 90° CW around Y, then 180° around X
+            case DOWN_EAST -> matrix.rotateY((float) (Math.PI / 2));
+            case WEST_DOWN -> matrix.rotateY((float) (-Math.PI / 2));
+            case EAST_UP -> {
                 matrix.rotateY((float) (Math.PI / 2));
                 matrix.rotateX((float) Math.PI);
             }
-            case UP_WEST -> { // 90° CCW around Y, then 180° around X
+            case UP_WEST -> {
                 matrix.rotateY((float) (-Math.PI / 2));
                 matrix.rotateX((float) Math.PI);
             }
-            case EAST_SOUTH -> matrix.rotateZ((float) (-Math.PI / 2)); // 90° CW around Z
-            case WEST_NORTH -> matrix.rotateZ((float) (Math.PI / 2)); // 90° CCW around Z
-            case NORTH_EAST -> { // 180° around Z
-                matrix.rotateZ((float) Math.PI);
-            }
-            case SOUTH_WEST -> { // 180° around X, then 90° CW around Z
+            case EAST_SOUTH -> matrix.rotateZ((float) (-Math.PI / 2));
+            case WEST_NORTH -> matrix.rotateZ((float) (Math.PI / 2));
+            case NORTH_EAST -> matrix.rotateZ((float) Math.PI);
+            case SOUTH_WEST -> {
                 matrix.rotateX((float) Math.PI);
                 matrix.rotateZ((float) (-Math.PI / 2));
             }
@@ -148,9 +157,6 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
         return matrix;
     }
 
-    /**
-     * Create a map of how directions transform under the given matrix
-     */
     private static Map<Direction, Direction> createFacePermutation(Matrix4f matrix) {
         Map<Direction, Direction> map = new EnumMap<>(Direction.class);
         for (Direction dir : Direction.values()) {
