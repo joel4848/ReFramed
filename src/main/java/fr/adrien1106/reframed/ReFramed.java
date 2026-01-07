@@ -39,6 +39,7 @@ public class ReFramed implements ModInitializer {
 	public static ReFramedBlock
         CUBE,
         CARPET,
+        SLOPE_FULL,
         SMALL_CUBE, SMALL_CUBES_STEP,
         STAIR, STAIRS_CUBE,
         HALF_STAIR, HALF_STAIRS_SLAB, HALF_STAIRS_STAIR, HALF_STAIRS_CUBE_STAIR, HALF_STAIRS_STEP_STAIR,
@@ -65,6 +66,7 @@ public class ReFramed implements ModInitializer {
 	public void onInitialize() {
 		CUBE                    = registerBlock("cube"                   , new ReFramedBlock(cp(Blocks.OAK_PLANKS)));
         CARPET                  = registerBlock("carpet"                 , new ReFramedCarpetBlock(cp(Blocks.OAK_SLAB)));
+        SLOPE_FULL              = registerBlock("slope_full"             , new ReFramedSlopeFullBlock(cp(Blocks.OAK_PLANKS)));
         SMALL_CUBE              = registerBlock("small_cube"             , new ReFramedSmallCubeBlock(cp(Blocks.OAK_PLANKS)));
 	  	SMALL_CUBES_STEP        = registerBlock("small_cubes_step"       , new ReFramedSmallCubesStepBlock(cp(Blocks.OAK_PLANKS)));
 		STAIR                   = registerBlock("stair"                  , new ReFramedStairBlock(cp(Blocks.OAK_STAIRS)));

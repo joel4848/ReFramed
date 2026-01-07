@@ -10,6 +10,7 @@ import net.minecraft.data.client.*;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import fr.adrien1106.reframed.generator.block.Carpet;
+import fr.adrien1106.reframed.generator.block.SlopeFull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class GBlockstate extends FabricModelProvider {
     private static final Map<Class<? extends Block>, BlockStateProvider> providers = new HashMap<>();
     static {
         providers.put(ReFramedCarpetBlock.class, new Carpet());
+        providers.put(ReFramedSlopeFullBlock.class, new SlopeFull());
         providers.put(ReFramedHalfStairBlock.class, new HalfStair());
         providers.put(ReFramedHalfStairsSlabBlock.class, new HalfStairsSlab());
         providers.put(ReFramedHalfStairsStairBlock.class, new HalfStairsStair());
