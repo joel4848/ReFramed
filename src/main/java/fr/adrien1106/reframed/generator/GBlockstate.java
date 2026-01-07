@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.data.client.*;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
+import fr.adrien1106.reframed.generator.block.Carpet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import static net.minecraft.data.client.VariantSettings.Rotation.R0;
 public class GBlockstate extends FabricModelProvider {
     private static final Map<Class<? extends Block>, BlockStateProvider> providers = new HashMap<>();
     static {
+        providers.put(ReFramedCarpetBlock.class, new Carpet());
         providers.put(ReFramedHalfStairBlock.class, new HalfStair());
         providers.put(ReFramedHalfStairsSlabBlock.class, new HalfStairsSlab());
         providers.put(ReFramedHalfStairsStairBlock.class, new HalfStairsStair());
@@ -64,17 +66,23 @@ public class GBlockstate extends FabricModelProvider {
         ReFramed.BLOCKS
             .forEach(model_generator::excludeFromSimpleItemModelGeneration);
         ReFramed.BLOCKS.stream()
-            .map(block -> {
-                if (providers.containsKey(block.getClass())) return providers.get(block.getClass()).getMultipart(block);
-                return VariantsBlockStateSupplier.create(
-                    block,
-                    GBlockstate.variant(
-                        ReFramed.id("cube_special"),
-                        true,
-                        R0, R0
-                    )
-                );
-            })
+                .map(block -> {
+                    if (providers.containsKey(block.getClass())) {
+                        BlockStateProvider provider = providers.get(block.getClass());
+                        if (provider instanceof Carpet carpet) {
+                            return carpet.getVariant(block);
+                        }
+                        return provider.getMultipart(block);
+                    }
+                    return VariantsBlockStateSupplier.create(
+                            block,
+                            GBlockstate.variant(
+                                    ReFramed.id("cube_special"),
+                                    true,
+                                    R0, R0
+                            )
+                    );
+                })
             .filter(Objects::nonNull)
             .forEach(model_generator.blockStateCollector);
     }

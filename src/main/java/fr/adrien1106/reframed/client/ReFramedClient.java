@@ -45,6 +45,8 @@ public class ReFramedClient implements ClientModInitializer {
 
 		// CUBE
 		HELPER.addReFramedModel("cube"                          , HELPER.auto(Identifier.ofVanilla("block/cube")));
+        // CARPET
+        HELPER.addReFramedModel("carpet"                        , HELPER.auto(ReFramed.id("block/carpet")));
 		// SMALL_CUBE
 		HELPER.addReFramedModel("small_cube"                    , HELPER.auto(ReFramed.id("block/small_cube/base")));
 		// SMALL_CUBES_STEP
@@ -235,7 +237,8 @@ public class ReFramedClient implements ClientModInitializer {
 
 		// item model assignments (in lieu of models/item/___.json)
 		HELPER.assignItemModel("cube"                    , ReFramed.CUBE);
-		HELPER.assignItemModel("small_cube"              , ReFramed.SMALL_CUBE);
+        HELPER.assignItemModel("carpet"                  , ReFramed.CARPET);
+        HELPER.assignItemModel("small_cube"              , ReFramed.SMALL_CUBE);
 		HELPER.assignItemModel("small_cubes_step"        , ReFramed.SMALL_CUBES_STEP);
 		HELPER.assignItemModel("slab"                    , ReFramed.SLAB);
 		HELPER.assignItemModel("double_slab"             , ReFramed.SLABS_CUBE);
