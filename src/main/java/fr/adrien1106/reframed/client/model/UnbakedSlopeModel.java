@@ -135,16 +135,21 @@ public class UnbakedSlopeModel extends UnbakedRetexturedModel {
                 matrix.rotateY((float) Math.PI);
                 matrix.rotateX((float) Math.PI);
             }
+
             case DOWN_EAST -> matrix.rotateY((float) (Math.PI / 2));
             case WEST_DOWN -> matrix.rotateY((float) (-Math.PI / 2));
             case EAST_UP -> {
                 matrix.rotateY((float) (Math.PI / 2));
                 matrix.rotateX((float) Math.PI);
+                matrix.rotateY((float) Math.PI);
             }
+
             case UP_WEST -> {
                 matrix.rotateY((float) (-Math.PI / 2));
                 matrix.rotateX((float) Math.PI);
+                matrix.rotateY((float) Math.PI);
             }
+
             case EAST_SOUTH -> matrix.rotateZ((float) (-Math.PI / 2));
             case WEST_NORTH -> matrix.rotateZ((float) (Math.PI / 2));
             case NORTH_EAST -> matrix.rotateZ((float) Math.PI);
