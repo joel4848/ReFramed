@@ -56,8 +56,8 @@ public final class SlopeFullMesh {
         e.emit();
 
         e.pos(0, 1f, 0f, 0f);
-        e.pos(1, 1f, 0f, 1f);
-        e.pos(2, 1f, 1f, 1f);
+        e.pos(1, 1f, 1f, 1f);
+        e.pos(2, 1f, 0f, 1f);
         e.pos(3, 1f, 0f, 0f);
 
         e.uv(0, 0f, 1f);
@@ -72,9 +72,9 @@ public final class SlopeFullMesh {
         e.emit();
 
         e.pos(0, 0f, 0f, 0f);
-        e.pos(1, 1f, 0f, 0f);
+        e.pos(1, 0f, 1f, 1f);
         e.pos(2, 1f, 1f, 1f);
-        e.pos(3, 0f, 1f, 1f);
+        e.pos(3, 1f, 0f, 0f);
 
         e.uv(0, 0f, 1f);
         e.uv(1, 1f, 1f);
