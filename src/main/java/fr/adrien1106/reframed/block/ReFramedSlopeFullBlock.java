@@ -1,5 +1,6 @@
 package fr.adrien1106.reframed.block;
 
+import fr.adrien1106.reframed.util.VoxelHelper;
 import fr.adrien1106.reframed.util.blocks.BlockHelper;
 import fr.adrien1106.reframed.util.blocks.Edge;
 import net.minecraft.block.Block;
@@ -11,10 +12,12 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
-import fr.adrien1106.reframed.util.VoxelHelper;
 
 import java.util.stream.Stream;
 
@@ -39,8 +42,43 @@ public class ReFramedSlopeFullBlock extends WaterloggableReFramedBlock {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Edge edge = BlockHelper.getPlacementEdge(ctx);
+        Edge edge = getSlopePlacementEdge(ctx);
         return super.getPlacementState(ctx).with(EDGE, edge);
+    }
+
+    private Edge getSlopePlacementEdge(ItemPlacementContext ctx) {
+        Direction clickedFace = ctx.getSide();
+        Vec3d hitPos = BlockHelper.getHitPos(ctx.getHitPos(), ctx.getBlockPos());
+
+        Direction.Axis parallelAxis = getParallelAxis(hitPos, clickedFace);
+        Direction slopeDirection =
+                BlockHelper.getHitDirection(parallelAxis, hitPos);
+
+        if (clickedFace.getAxis() == Direction.Axis.Y) {
+
+            slopeDirection = slopeDirection.getOpposite();
+        } else if (parallelAxis != Direction.Axis.Y) {
+
+            slopeDirection = slopeDirection.getOpposite();
+        }
+
+        Direction baseFace =
+                clickedFace.getAxis() == Direction.Axis.Y
+                        ? clickedFace.getOpposite()
+                        : clickedFace;
+
+        return Edge.getByDirections(baseFace, slopeDirection);
+    }
+
+    private Direction.Axis getParallelAxis(Vec3d hitPos, Direction clickedFace) {
+        return Stream.of(Direction.Axis.values())
+                .filter(axis -> axis != clickedFace.getAxis())
+                .reduce((axis1, axis2) ->
+                        Math.abs(axis1.choose(hitPos.x, hitPos.y, hitPos.z)) >
+                                Math.abs(axis2.choose(hitPos.x, hitPos.y, hitPos.z))
+                                ? axis1 : axis2
+                )
+                .orElse(Direction.Axis.X);
     }
 
     @Override
@@ -66,7 +104,6 @@ public class ReFramedSlopeFullBlock extends WaterloggableReFramedBlock {
     }
 
     static {
-
         VoxelShape BASE_SLOPE = Stream.of(
                 createCuboidShape(0, 0, 0, 16, 2, 16),
                 createCuboidShape(0, 2, 2, 16, 4, 16),
