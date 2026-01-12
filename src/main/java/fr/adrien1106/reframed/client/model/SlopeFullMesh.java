@@ -7,186 +7,85 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.util.math.Direction;
 
-public class SlopeFullMesh {
+public final class SlopeFullMesh {
 
-    public static Mesh getSlopeMesh() {
-        Renderer renderer = ReFramedClient.HELPER.getFabricRenderer();
-        MeshBuilder builder = renderer.meshBuilder();
-        QuadEmitter emitter = builder.getEmitter();
+    private SlopeFullMesh() {}
 
-        emitter
-                .pos(0, 1f, 1f, 0f)
-                .pos(1, 0f, 1f, 0f)
-                .pos(2, 0f, 0f, 1f)
-                .pos(3, 1f, 0f, 1f)
-                .uv(0, 1f, 0f)
-                .uv(1, 0f, 0f)
-                .uv(2, 0f, 1f)
-                .uv(3, 1f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(null)
-                .nominalFace(Direction.UP)
-                .tag(Direction.UP.ordinal() + 1)
-                .emit();
+    private static Mesh BASE_MESH;
 
-        emitter
-                .square(Direction.DOWN, 0, 0, 1, 1, 0)
-                .uvUnitSquare()
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.DOWN)
-                .tag(Direction.DOWN.ordinal() + 1)
-                .emit();
-
-        emitter
-                .pos(0, 0f, 0f, 1f)
-                .pos(1, 0f, 1f, 0f)
-                .pos(2, 0f, 0f, 0f)
-                .pos(3, 0f, 0f, 1f)
-                .uv(0, 1f, 1f)
-                .uv(1, 1f, 0f)
-                .uv(2, 0f, 1f)
-                .uv(3, 1f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.WEST)
-                .nominalFace(Direction.WEST)
-                .tag(Direction.WEST.ordinal() + 1)
-                .emit();
-
-        emitter
-                .pos(0, 1f, 0f, 0f)
-                .pos(1, 1f, 1f, 0f)
-                .pos(2, 1f, 0f, 1f)
-                .pos(3, 1f, 0f, 0f)
-                .uv(0, 0f, 1f)
-                .uv(1, 0f, 0f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.EAST)
-                .nominalFace(Direction.EAST)
-                .tag(Direction.EAST.ordinal() + 1)
-                .emit();
-
-        emitter
-                .pos(0, 0f, 1f, 0f)
-                .pos(1, 1f, 1f, 0f)
-                .pos(2, 1f, 0f, 0f)
-                .pos(3, 0f, 0f, 0f)
-                .uv(0, 0f, 0f)
-                .uv(1, 1f, 0f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.NORTH)
-                .nominalFace(Direction.NORTH)
-                .tag(Direction.NORTH.ordinal() + 1)
-                .emit();
-
-        emitter
-                .pos(0, 0f, 0f, 1f)
-                .pos(1, 1f, 0f, 1f)
-                .pos(2, 1f, 0f, 1f)
-                .pos(3, 0f, 0f, 1f)
-                .uv(0, 0f, 1f)
-                .uv(1, 1f, 1f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.SOUTH)
-                .nominalFace(Direction.SOUTH)
-                .tag(Direction.SOUTH.ordinal() + 1)
-                .emit();
-
-        return builder.build();
+    public static Mesh getBaseMesh() {
+        if (BASE_MESH == null) {
+            BASE_MESH = buildMesh();
+        }
+        return BASE_MESH;
     }
 
-    public static Mesh getItemMesh() {
+    private static Mesh buildMesh() {
         Renderer renderer = ReFramedClient.HELPER.getFabricRenderer();
         MeshBuilder builder = renderer.meshBuilder();
-        QuadEmitter emitter = builder.getEmitter();
+        QuadEmitter e = builder.getEmitter();
 
-        emitter
-                .pos(0, 0f, 1f, 1f)
-                .pos(1, 1f, 1f, 1f)
-                .pos(2, 1f, 0f, 0f)
-                .pos(3, 0f, 0f, 0f)
-                .uv(0, 0f, 1f)
-                .uv(1, 1f, 1f)
-                .uv(2, 1f, 0f)
-                .uv(3, 0f, 0f)
-                .color(-1, -1, -1, -1)
-                .cullFace(null)
-                .nominalFace(Direction.UP)
-                .tag(Direction.UP.ordinal() + 1)
-                .emit();
+        e.square(Direction.DOWN, 0f, 0f, 1f, 1f, 0f);
+        e.color(-1, -1, -1, -1);
+        e.cullFace(Direction.DOWN);
+        e.nominalFace(Direction.DOWN);
+        e.tag(Direction.DOWN.ordinal() + 1);
+        e.emit();
 
-        emitter
-                .square(Direction.DOWN, 0, 0, 1, 1, 0)
-                .uvUnitSquare()
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.DOWN)
-                .tag(Direction.DOWN.ordinal() + 1)
-                .emit();
+        e.square(Direction.SOUTH, 0f, 0f, 1f, 1f, 0f);
+        e.color(-1, -1, -1, -1);
+        e.cullFace(Direction.SOUTH);
+        e.nominalFace(Direction.SOUTH);
+        e.tag(Direction.SOUTH.ordinal() + 1);
+        e.emit();
 
-        emitter
-                .pos(0, 1f, 0f, 0f)
-                .pos(1, 1f, 1f, 1f)
-                .pos(2, 1f, 0f, 1f)
-                .pos(3, 1f, 0f, 0f)
-                .uv(0, 0f, 1f)
-                .uv(1, 0f, 0f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.EAST)
-                .nominalFace(Direction.EAST)
-                .tag(Direction.EAST.ordinal() + 1)
-                .emit();
+        e.pos(0, 0f, 0f, 0f);
+        e.pos(1, 0f, 0f, 1f);
+        e.pos(2, 0f, 1f, 1f);
+        e.pos(3, 0f, 0f, 0f);
 
-        emitter
-                .pos(0, 0f, 0f, 1f)
-                .pos(1, 0f, 1f, 1f)
-                .pos(2, 0f, 0f, 0f)
-                .pos(3, 0f, 0f, 1f)
-                .uv(0, 1f, 1f)
-                .uv(1, 1f, 0f)
-                .uv(2, 0f, 1f)
-                .uv(3, 1f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.WEST)
-                .nominalFace(Direction.WEST)
-                .tag(Direction.WEST.ordinal() + 1)
-                .emit();
+        e.uv(0, 0f, 1f);
+        e.uv(1, 1f, 1f);
+        e.uv(2, 1f, 0f);
+        e.uv(3, 0f, 1f);
 
-        emitter
-                .pos(0, 0f, 0f, 1f)
-                .pos(1, 1f, 0f, 1f)
-                .pos(2, 1f, 0f, 1f)
-                .pos(3, 0f, 0f, 1f)
-                .uv(0, 0f, 1f)
-                .uv(1, 1f, 1f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.SOUTH)
-                .nominalFace(Direction.SOUTH)
-                .tag(Direction.SOUTH.ordinal() + 1)
-                .emit();
+        e.color(-1, -1, -1, -1);
+        e.cullFace(Direction.WEST);
+        e.nominalFace(Direction.WEST);
+        e.tag(Direction.WEST.ordinal() + 1);
+        e.emit();
 
-        emitter
-                .pos(0, 0f, 1f, 1f)
-                .pos(1, 1f, 1f, 1f)
-                .pos(2, 1f, 0f, 1f)
-                .pos(3, 0f, 0f, 1f)
-                .uv(0, 0f, 0f)
-                .uv(1, 1f, 0f)
-                .uv(2, 1f, 1f)
-                .uv(3, 0f, 1f)
-                .color(-1, -1, -1, -1)
-                .cullFace(Direction.NORTH)
-                .nominalFace(Direction.NORTH)
-                .tag(Direction.NORTH.ordinal() + 1)
-                .emit();
+        e.pos(0, 1f, 0f, 0f);
+        e.pos(1, 1f, 0f, 1f);
+        e.pos(2, 1f, 1f, 1f);
+        e.pos(3, 1f, 0f, 0f);
+
+        e.uv(0, 0f, 1f);
+        e.uv(1, 1f, 1f);
+        e.uv(2, 1f, 0f);
+        e.uv(3, 0f, 1f);
+
+        e.color(-1, -1, -1, -1);
+        e.cullFace(Direction.EAST);
+        e.nominalFace(Direction.EAST);
+        e.tag(Direction.EAST.ordinal() + 1);
+        e.emit();
+
+        e.pos(0, 0f, 0f, 0f);
+        e.pos(1, 1f, 0f, 0f);
+        e.pos(2, 1f, 1f, 1f);
+        e.pos(3, 0f, 1f, 1f);
+
+        e.uv(0, 0f, 1f);
+        e.uv(1, 1f, 1f);
+        e.uv(2, 1f, 0f);
+        e.uv(3, 0f, 0f);
+
+        e.color(-1, -1, -1, -1);
+        e.cullFace(null);
+        e.nominalFace(Direction.UP);
+        e.tag(Direction.UP.ordinal() + 1);
+        e.emit();
 
         return builder.build();
     }

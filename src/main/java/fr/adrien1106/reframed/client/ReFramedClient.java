@@ -48,7 +48,7 @@ public class ReFramedClient implements ClientModInitializer {
 		HELPER.addReFramedModel("cube"                          , HELPER.auto(Identifier.ofVanilla("block/cube")));
         // CARPET
         HELPER.addReFramedModel("carpet"                        , HELPER.auto(ReFramed.id("block/carpet")));
-        // SLOPE_FULL - ADD THESE LINES
+        // SLOPE_FULL
         HELPER.addReFramedModel("slope_full"                    , new UnbakedSlopeModel(ReFramed.id("block/slope_full")));
 		// SMALL_CUBE
 		HELPER.addReFramedModel("small_cube"                    , HELPER.auto(ReFramed.id("block/small_cube/base")));
